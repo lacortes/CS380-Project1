@@ -25,8 +25,7 @@ public class ChatClient extends JFrame {
 	private JButton sendButton;
 
 	private String ip; 
-	private String userText; // Will not be null when user has entered a value
-							 // in the textfield and press send
+	private String userText; 
 	private PrintStream outStream;
 
 	private final int WINDOW_WIDTH = 600;
@@ -42,6 +41,7 @@ public class ChatClient extends JFrame {
 		textArea.append("Establishing connection\n");
 
 		try {
+			// Connect to port
 			Socket socket = new Socket(ip, 38001);
 			System.out.println("conncted");
 			addToAreaText("Connected to "+ip);
@@ -131,11 +131,10 @@ public class ChatClient extends JFrame {
 	 */
 	private void SendButtonActionPerforemd(ActionEvent event) {
 		System.out.println("send button pressed");
-		// String text = textField.getText();
-		userText = new String(textField.getText());
-		textField.setText("");
+		userText = new String(textField.getText()); // Get text from user
+		textField.setText(""); // erase text field
 		outStream.println(userText); // Send to server
-		textArea.append("ME < "+userText.toString());
+		textArea.append("ME < "+userText.toString()); // Display user text on GUI
 		textArea.append("\n");
 		System.out.println("**"+userText+"**");
 	}
@@ -171,14 +170,19 @@ public class ChatClient extends JFrame {
 			System.out.println("Listening for server ... ");
 			while(true) {
 				try {
-					String word = bufferReader.readLine();
-					System.out.println(word);
-					if (word != null) {
-						publish(word);
-					} 
 
-					if (!bufferReader.ready()) return null;
-				} catch (IOException e) {e.printStackTrace();}
+					// Read input if buffer is ready 
+					if (bufferReader.ready()) {
+						String word = bufferReader.readLine();
+						System.out.println(word);
+
+						publish(word);
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
 			} // end while
 		}
 
